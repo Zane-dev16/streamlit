@@ -278,6 +278,7 @@ class WStates(MutableMapping[str, Any]):
         else:
             callback(*args, **kwargs)
 
+
 def _missing_key_error_message(key: str) -> str:
     return (
         f'st.session_state has no key "{key}". Did you forget to initialize it? '

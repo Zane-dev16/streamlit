@@ -146,10 +146,11 @@ def _maybe_print_use_warning() -> None:
                 "[ARGUMENTS]"
             )
 
+
 def _maybe_print_fragment_callback_warning(delta_type: str) -> None:
     """Print a warning if elements are being modified during a fragment callback."""
     ctx = get_script_run_ctx()
-    if ctx and getattr(ctx, 'in_fragment_callback', False):
+    if ctx and getattr(ctx, "in_fragment_callback", False):
         warning = cli_util.style_for_cli("Warning:", bold=True, fg="yellow")
 
         logger.get_logger("root").warning(
@@ -173,6 +174,7 @@ def _maybe_print_fragment_callback_warning(delta_type: str) -> None:
             "      if st.button('Click me'):\n"
             "          st.write('Button was clicked!')\n"
         )
+
 
 class DeltaGenerator(
     AlertMixin,

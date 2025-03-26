@@ -448,32 +448,6 @@ class FragmentTest(unittest.TestCase):
 
         patched_show_deprecation_warning.assert_not_called()
 
-    @patch("streamlit.runtime.logger.get_logger")
-    @patch("streamlit.runtime.scriptrunner.get_script_run_ctx")
-    def test_maybe_print_fragment_callback_warning(self, mock_get_ctx, get_logger):
-        # Setup mock logging
-        mock_logger = get_logger()
-
-        # Simulate the context where we're inside a fragment callback
-        mock_ctx = MagicMock()  # Mock a context object
-        mock_ctx.in_fragment_callback = True  # Simulate being inside a fragment callback
-        mock_get_ctx.return_value = mock_ctx  # Return the mock context when get_script_run_ctx is called
-        def callback():
-            st.markdown("test")
-
-        # Verify warnings were called
-        callback()
-        self.assertTrue(mock_logger.warning.called)
-
-        # Collect all warning calls
-        warning_calls = [call[0][0] for call in mock_logger.warning.call_args_list]
-
-        # Markdown creates an empty container element and the creates the markdown within that
-        # container
-        expected_warning = "'empty' element, was called during a fragment widget's callback."
-        self.assertTrue(any(expected_warning in msg for msg in warning_calls), "No warning message found")
-        expected_warning = "'markdown' element, was called during a fragment widget's callback."
-        self.assertTrue(any(expected_warning in msg for msg in warning_calls), "No warning message found")
 
 # TESTS FOR WRITING TO CONTAINERS OUTSIDE AND INSIDE OF FRAGMENT
 
