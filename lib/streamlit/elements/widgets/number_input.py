@@ -23,6 +23,11 @@ from typing_extensions import TypeAlias
 
 from streamlit.elements.lib.form_utils import current_form_id
 from streamlit.elements.lib.js_number import JSNumber, JSNumberBoundsException
+from streamlit.elements.lib.layout_utils import (
+    LayoutConfig,
+    WidthWithoutContent,
+    validate_width,
+)
 from streamlit.elements.lib.policies import (
     check_widget_policies,
     maybe_raise_label_warnings,
@@ -80,10 +85,6 @@ class NumberInputSerde:
 
 
 class NumberInputMixin:
-    # For easier readability, all the arguments with un-changing types across these overload signatures have been
-    # collapsed onto a single line.
-
-    # fmt: off
     # If "min_value: int" is given and all other numerical inputs are
     #   "int"s or not provided (value optionally being "min"), return "int"
     # If "min_value: int, value: None" is given and all other numerical inputs
@@ -96,9 +97,19 @@ class NumberInputMixin:
         max_value: int | None = None,
         value: IntOrNone | Literal["min"] = "min",
         step: int | None = None,
-        format: str | None = None, key: Key | None = None, help: str | None = None, on_change: WidgetCallback | None = None, args: WidgetArgs | None = None, kwargs: WidgetKwargs | None = None, *, placeholder: str | None = None, disabled: bool = False, label_visibility: LabelVisibility = "visible", icon: str | None = None
-    ) -> int | IntOrNone:
-        ...
+        format: str | None = None,
+        key: Key | None = None,
+        help: str | None = None,
+        on_change: WidgetCallback | None = None,
+        args: WidgetArgs | None = None,
+        kwargs: WidgetKwargs | None = None,
+        *,
+        placeholder: str | None = None,
+        disabled: bool = False,
+        label_visibility: LabelVisibility = "visible",
+        icon: str | None = None,
+        width: WidthWithoutContent = "stretch",
+    ) -> int | IntOrNone: ...
 
     # If "max_value: int" is given and all other numerical inputs are
     #   "int"s or not provided (value optionally being "min"), return "int"
@@ -108,14 +119,23 @@ class NumberInputMixin:
     def number_input(
         self,
         label: str,
-        min_value: int | None = None,
+        min_value: None = None,
         *,
         max_value: int,
         value: IntOrNone | Literal["min"] = "min",
         step: int | None = None,
-        format: str | None = None, key: Key | None = None, help: str | None = None, on_change: WidgetCallback | None = None, args: WidgetArgs | None = None, kwargs: WidgetKwargs | None = None, placeholder: str | None = None, disabled: bool = False, label_visibility: LabelVisibility = "visible", icon: str | None = None
-    ) -> int | IntOrNone:
-        ...
+        format: str | None = None,
+        key: Key | None = None,
+        help: str | None = None,
+        on_change: WidgetCallback | None = None,
+        args: WidgetArgs | None = None,
+        kwargs: WidgetKwargs | None = None,
+        placeholder: str | None = None,
+        disabled: bool = False,
+        label_visibility: LabelVisibility = "visible",
+        icon: str | None = None,
+        width: WidthWithoutContent = "stretch",
+    ) -> int | IntOrNone: ...
 
     # If "value=int" is given and all other numerical inputs are "int"s
     #   or not provided, return "int"
@@ -128,9 +148,18 @@ class NumberInputMixin:
         *,
         value: int,
         step: int | None = None,
-        format: str | None = None, key: Key | None = None, help: str | None = None, on_change: WidgetCallback | None = None, args: WidgetArgs | None = None, kwargs: WidgetKwargs | None = None, placeholder: str | None = None, disabled: bool = False, label_visibility: LabelVisibility = "visible", icon: str | None = None
-    ) -> int:
-        ...
+        format: str | None = None,
+        key: Key | None = None,
+        help: str | None = None,
+        on_change: WidgetCallback | None = None,
+        args: WidgetArgs | None = None,
+        kwargs: WidgetKwargs | None = None,
+        placeholder: str | None = None,
+        disabled: bool = False,
+        label_visibility: LabelVisibility = "visible",
+        icon: str | None = None,
+        width: WidthWithoutContent = "stretch",
+    ) -> int: ...
 
     # If "step=int" is given and all other numerical inputs are "int"s
     #   or not provided (value optionally being "min"), return "int"
@@ -140,14 +169,23 @@ class NumberInputMixin:
     def number_input(
         self,
         label: str,
-        min_value: int | None = None,
-        max_value: int | None = None,
+        min_value: None = None,
+        max_value: None = None,
         value: IntOrNone | Literal["min"] = "min",
         *,
         step: int,
-        format: str | None = None, key: Key | None = None, help: str | None = None, on_change: WidgetCallback | None = None, args: WidgetArgs | None = None, kwargs: WidgetKwargs | None = None, placeholder: str | None = None, disabled: bool = False, label_visibility: LabelVisibility = "visible", icon: str | None = None
-    ) -> int | IntOrNone:
-        ...
+        format: str | None = None,
+        key: Key | None = None,
+        help: str | None = None,
+        on_change: WidgetCallback | None = None,
+        args: WidgetArgs | None = None,
+        kwargs: WidgetKwargs | None = None,
+        placeholder: str | None = None,
+        disabled: bool = False,
+        label_visibility: LabelVisibility = "visible",
+        icon: str | None = None,
+        width: WidthWithoutContent = "stretch",
+    ) -> int | IntOrNone: ...
 
     # If all numerical inputs are floats (with value optionally being "min")
     #   or are not provided, return "float"
@@ -161,10 +199,19 @@ class NumberInputMixin:
         max_value: float | None = None,
         value: FloatOrNone | Literal["min"] = "min",
         step: float | None = None,
-        format: str | None = None, key: Key | None = None, help: str | None = None, on_change: WidgetCallback | None = None, args: WidgetArgs | None = None, kwargs: WidgetKwargs | None = None, *, placeholder: str | None = None, disabled: bool = False, label_visibility: LabelVisibility = "visible", icon: str | None = None
-    ) -> float | FloatOrNone:
-        ...
-    # # fmt: on
+        format: str | None = None,
+        key: Key | None = None,
+        help: str | None = None,
+        on_change: WidgetCallback | None = None,
+        args: WidgetArgs | None = None,
+        kwargs: WidgetKwargs | None = None,
+        *,
+        placeholder: str | None = None,
+        disabled: bool = False,
+        label_visibility: LabelVisibility = "visible",
+        icon: str | None = None,
+        width: WidthWithoutContent = "stretch",
+    ) -> float | FloatOrNone: ...
 
     @gather_metrics("number_input")
     def number_input(
@@ -185,12 +232,13 @@ class NumberInputMixin:
         disabled: bool = False,
         label_visibility: LabelVisibility = "visible",
         icon: str | None = None,
+        width: WidthWithoutContent = "stretch",
     ) -> Number | None:
         r"""Display a numeric input widget.
 
         .. note::
             Integer values exceeding +/- ``(1<<53) - 1`` cannot be accurately
-            stored or returned by the widget due to serialization contstraints
+            stored or returned by the widget due to serialization constraints
             between the Python server and JavaScript client. You must handle
             such numbers as floats, leading to a loss in precision.
 
@@ -286,7 +334,7 @@ class NumberInputMixin:
         label_visibility : "visible", "hidden", or "collapsed"
             The visibility of the label. The default is ``"visible"``. If this
             is ``"hidden"``, Streamlit displays an empty spacer instead of the
-            label, which can help keep the widget alligned with other widgets.
+            label, which can help keep the widget aligned with other widgets.
             If this is ``"collapsed"``, Streamlit displays no label or spacer.
 
         icon : str, None
@@ -306,6 +354,9 @@ class NumberInputMixin:
               Thumb Up icon. Find additional icons in the `Material Symbols \
               <https://fonts.google.com/icons?icon.set=Material+Symbols&icon.style=Rounded>`_
               font library.
+
+        width : WidthWithoutContent
+            The width of the number input. Can be an integer or "stretch". Defaults to "stretch".
 
         Returns
         -------
@@ -355,6 +406,7 @@ class NumberInputMixin:
             disabled=disabled,
             label_visibility=label_visibility,
             icon=icon,
+            width=width,
             ctx=ctx,
         )
 
@@ -376,6 +428,7 @@ class NumberInputMixin:
         disabled: bool = False,
         label_visibility: LabelVisibility = "visible",
         icon: str | None = None,
+        width: WidthWithoutContent = "stretch",
         ctx: ScriptRunContext | None = None,
     ) -> Number | None:
         key = to_key(key)
@@ -392,6 +445,7 @@ class NumberInputMixin:
             "number_input",
             user_key=key,
             form_id=current_form_id(self.dg),
+            dg=self.dg,
             label=label,
             min_value=min_value,
             max_value=max_value,
@@ -401,6 +455,7 @@ class NumberInputMixin:
             help=help,
             placeholder=None if placeholder is None else str(placeholder),
             icon=icon,
+            width=width,
         )
 
         # Ensure that all arguments are of the same type.
@@ -416,7 +471,9 @@ class NumberInputMixin:
         )
 
         if not all_int_args and not all_float_args:
-            raise StreamlitMixedNumericTypesError(value=value, min_value=min_value, max_value=max_value, step=step)
+            raise StreamlitMixedNumericTypesError(
+                value=value, min_value=min_value, max_value=max_value, step=step
+            )
 
         session_state = get_session_state().filtered_state
         if key is not None and key in session_state and session_state[key] is None:
@@ -469,7 +526,6 @@ class NumberInputMixin:
             float(number_format % 2)
         except (TypeError, ValueError):
             raise StreamlitInvalidNumberFormatError(number_format)
-
 
         # Ensure that the value matches arguments' types.
         all_ints = int_value and all_int_args
@@ -561,22 +617,37 @@ class NumberInputMixin:
             deserializer=serde.deserialize,
             serializer=serde.serialize,
             ctx=ctx,
-            value_type="double_value"
+            value_type="double_value",
         )
 
         if widget_state.value_changed:
             if widget_state.value is not None:
                 # Min/Max bounds checks when the value is updated.
-                if number_input_proto.has_min and widget_state.value < number_input_proto.min:
-                    raise StreamlitValueBelowMinError(value=widget_state.value, min_value=number_input_proto.min)
+                if (
+                    number_input_proto.has_min
+                    and widget_state.value < number_input_proto.min
+                ):
+                    raise StreamlitValueBelowMinError(
+                        value=widget_state.value, min_value=number_input_proto.min
+                    )
 
-                if number_input_proto.has_max and widget_state.value > number_input_proto.max:
-                    raise StreamlitValueAboveMaxError(value=widget_state.value, max_value=number_input_proto.max)
+                if (
+                    number_input_proto.has_max
+                    and widget_state.value > number_input_proto.max
+                ):
+                    raise StreamlitValueAboveMaxError(
+                        value=widget_state.value, max_value=number_input_proto.max
+                    )
 
                 number_input_proto.value = widget_state.value
             number_input_proto.set_value = True
 
-        self.dg._enqueue("number_input", number_input_proto)
+        validate_width(width)
+        layout_config = LayoutConfig(width=width)
+
+        self.dg._enqueue(
+            "number_input", number_input_proto, layout_config=layout_config
+        )
         return widget_state.value
 
     @property
