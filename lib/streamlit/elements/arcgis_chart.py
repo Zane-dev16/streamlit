@@ -40,7 +40,7 @@ from streamlit.elements.lib.streamlit_plotly_theme import (
 )
 from streamlit.elements.lib.utils import Key, compute_and_register_element_id, to_key
 from streamlit.errors import StreamlitAPIException
-from streamlit.proto.PlotlyChart_pb2 import PlotlyChart as PlotlyChartProto
+from streamlit.proto.ArcgisChart_pb2 import ArcgisChart as PlotlyChartProto
 from streamlit.runtime.metrics_util import gather_metrics
 from streamlit.runtime.scriptrunner_utils.script_run_context import get_script_run_ctx
 from streamlit.runtime.state import WidgetCallback, register_widget
@@ -501,9 +501,9 @@ class ArcgisMixin:
                 value_type="string_value",
             )
 
-            self.dg._enqueue("plotly_chart", plotly_chart_proto)
+            self.dg._enqueue("arcgis_chart", plotly_chart_proto)
             return cast("PlotlyState", widget_state.value)
-        return self.dg._enqueue("plotly_chart", plotly_chart_proto)
+        return self.dg._enqueue("arcgis_chart", plotly_chart_proto)
 
     @property
     def dg(self) -> DeltaGenerator:
