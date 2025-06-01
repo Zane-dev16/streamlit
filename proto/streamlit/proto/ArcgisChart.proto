@@ -35,6 +35,9 @@ message ArcgisChart {
   // Form ID, filled if selections are activated.
   string form_id = 9;
 
+  // Height in pixels
+  uint32 height = 12;
+
   // JSON-serialized dict containing keys from the set {data, frames, layout}.
   string spec = 10;
 
