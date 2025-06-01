@@ -18,9 +18,5 @@ import streamlit as st
 
 gis = GIS()
 usa_map = gis.map("USA")
-st.write(usa_map.extent)
-st.write(usa_map.zoom)
-st.write(usa_map.basemap)
-st.write(usa_map.center)
 
 st.arcgis_chart(usa_map)
