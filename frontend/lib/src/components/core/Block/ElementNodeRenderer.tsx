@@ -99,7 +99,7 @@ import {
 import { StyledElementContainerLayoutWrapper } from "./StyledElementContainerLayoutWrapper"
 
 // Lazy-load elements.
-const ArcgisChart = lazy(() => import("~lib/components/elements/PlotlyChart"))
+const ArcgisChart = lazy(() => import("~lib/components/elements/ArcgisChart"))
 const Audio = lazy(() => import("~lib/components/elements/Audio"))
 const Balloons = lazy(() => import("~lib/components/elements/Balloons"))
 const Snow = lazy(() => import("~lib/components/elements/Snow"))

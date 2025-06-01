@@ -23,4 +23,5 @@ data = {"x": [1, 2, 3, 4, 5], "y": [10, 11, 12, 13, 14]}
 fig = px.line(data_frame=data, x="x", y="y", title="Simple Line Chart")
 
 # Display the chart in Streamlit
+st.title("ArcGIS Chart Demo")
 st.arcgis_chart(fig)
