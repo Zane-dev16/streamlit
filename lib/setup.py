@@ -32,6 +32,7 @@ VERSION = "1.45.1"  # PEP-440
 # - And include an upper bound that's < NEXT_MAJOR_VERSION
 INSTALL_REQUIRES = [
     "altair>=4.0, <6",
+    "arcgis>=1.9.0, <3",
     "blinker>=1.5.0, <2",
     "cachetools>=4.0, <7",
     "click>=7.0, <9",
