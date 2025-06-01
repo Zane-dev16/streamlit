@@ -25,25 +25,59 @@ interface ArcGISChartProps {
   element: PlotlyChartProto
 }
 
+function calculateCenterFromExtent(extent: {
+  xmin: number
+  ymin: number
+  xmax: number
+  ymax: number
+}): [number, number] {
+  return [(extent.xmin + extent.xmax) / 2, (extent.ymin + extent.ymax) / 2]
+}
+
 export const ArcGISChart: React.FC<ArcGISChartProps> = ({ element }) => {
   const mapRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<MapView | null>(null)
 
-  /*
-  const { basemap = "streets-vector", view = {}, style = {} } = element
+  let mapData: {
+    widget_html?: string
+    center?: [number, number]
+    zoom?: number
+    basemap?: string
+    extent?: {
+      xmin: number
+      ymin: number
+      xmax: number
+      ymax: number
+    }
+  } = {}
 
-  const { center = [-118.805, 34.027], zoom = 13 } = view
+  mapData = JSON.parse(element.spec)
 
-  const { height = "500px", width = "100%" } = style
-*/
+  // Calculate center from extent if center not provided or invalid
+  let center = mapData.center
+  if (
+    !Array.isArray(center) ||
+    center.length !== 2 ||
+    center.some(v => typeof v !== "number")
+  ) {
+    if (mapData.extent) {
+      center = calculateCenterFromExtent(mapData.extent)
+    } else {
+      center = [0, 0] // fallback to world center
+    }
+  }
 
-  const basemap = "streets-vector"
-  const zoom = 13
+  // Validate zoom or fallback to default
+  const zoom =
+    typeof mapData.zoom === "number" && mapData.zoom >= 0 ? mapData.zoom : 4
+
+  const basemap =
+    mapData.basemap == "default" ? "streets-vector" : mapData.basemap
+
   const height = "500px"
   const width = "100%"
 
   useEffect(() => {
-    const center = [-118.805, 34.027]
     const map = new Map({ basemap })
 
     const view = new MapView({
@@ -59,7 +93,7 @@ export const ArcGISChart: React.FC<ArcGISChartProps> = ({ element }) => {
       viewRef.current?.destroy()
       viewRef.current = null
     }
-  }, [element])
+  }, [basemap, center, zoom]) // re-run if any of these change
 
   return (
     <div ref={mapRef} style={{ height, width }} data-testid="arcgis-chart" />
