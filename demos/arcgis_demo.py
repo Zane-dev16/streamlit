@@ -11,12 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from arcgis.features import FeatureLayer
 from arcgis.gis import GIS
 
 import streamlit as st
 
 gis = GIS()
 usa_map = gis.map("USA")
+layer_url = "https://services2.arcgis.com/ZQgQTuoyBrtmoGdP/arcgis/rest/services/SF_311_Incidents/FeatureServer/0"
+layer = FeatureLayer(layer_url)
+usa_map.add_layer(layer)
 
-st.arcgis_chart(usa_map)
+# Display in Streamlit (if you have a Streamlit ArcGIS component)
+st.arcgis_chart(usa_map, height=200)

@@ -18,11 +18,29 @@ import React, { memo, useEffect, useRef } from "react"
 
 import MapView from "@arcgis/core/views/MapView"
 import Map from "@arcgis/core/Map"
+import FeatureLayer from "@arcgis/core/layers/FeatureLayer"
+import TileLayer from "@arcgis/core/layers/TileLayer"
+import VectorTileLayer from "@arcgis/core/layers/VectorTileLayer"
+import MapImageLayer from "@arcgis/core/layers/MapImageLayer"
+import ImageryLayer from "@arcgis/core/layers/ImageryLayer"
+import WMTSLayer from "@arcgis/core/layers/WMTSLayer"
+import WMSLayer from "@arcgis/core/layers/WMSLayer"
+import WebTileLayer from "@arcgis/core/layers/WebTileLayer"
+import OpenStreetMapLayer from "@arcgis/core/layers/OpenStreetMapLayer"
+import KMLLayer from "@arcgis/core/layers/KMLLayer"
+import CSVLayer from "@arcgis/core/layers/CSVLayer"
+import GeoJSONLayer from "@arcgis/core/layers/GeoJSONLayer"
+import IntegratedMeshLayer from "@arcgis/core/layers/IntegratedMeshLayer"
+import PointCloudLayer from "@arcgis/core/layers/PointCloudLayer"
+import ElevationLayer from "@arcgis/core/layers/ElevationLayer"
+import VideoLayer from "@arcgis/core/layers/VideoLayer"
+import VoxelLayer from "@arcgis/core/layers/VoxelLayer"
+import Layer from "@arcgis/core/layers/Layer"
 
-import { PlotlyChart as PlotlyChartProto } from "@streamlit/protobuf"
+import { ArcgisChart as ArcgisChartProto } from "@streamlit/protobuf"
 
 interface ArcGISChartProps {
-  element: PlotlyChartProto
+  element: ArcgisChartProto
 }
 
 function calculateCenterFromExtent(extent: {
@@ -32,6 +50,53 @@ function calculateCenterFromExtent(extent: {
   ymax: number
 }): [number, number] {
   return [(extent.xmin + extent.xmax) / 2, (extent.ymin + extent.ymax) / 2]
+}
+
+function createLayerFromInfo(layerInfo: {
+  type: string
+  url: string
+  id?: string
+  title?: string
+}): Layer | null {
+  const { type, url, id, title, ...rest } = layerInfo
+  switch (type) {
+    case "FeatureLayer":
+      return new FeatureLayer({ url, id, title, ...rest })
+    case "TileLayer":
+      return new TileLayer({ url, id, title, ...rest })
+    case "VectorTileLayer":
+      return new VectorTileLayer({ url, id, title, ...rest })
+    case "MapImageLayer":
+      return new MapImageLayer({ url, id, title, ...rest })
+    case "ImageryLayer":
+      return new ImageryLayer({ url, id, title, ...rest })
+    case "WMTSLayer":
+      return new WMTSLayer({ url, id, title, ...rest })
+    case "WMSLayer":
+      return new WMSLayer({ url, id, title, ...rest })
+    case "WebTileLayer":
+      return new WebTileLayer({ urlTemplate: url, id, title, ...rest })
+    case "OpenStreetMapLayer":
+      return new OpenStreetMapLayer({ urlTemplate: url, id, title, ...rest })
+    case "KMLLayer":
+      return new KMLLayer({ url, id, title, ...rest })
+    case "CSVLayer":
+      return new CSVLayer({ url, id, title, ...rest })
+    case "GeoJSONLayer":
+      return new GeoJSONLayer({ url, id, title, ...rest })
+    case "IntegratedMeshLayer":
+      return new IntegratedMeshLayer({ url, id, title, ...rest })
+    case "PointCloudLayer":
+      return new PointCloudLayer({ url, id, title, ...rest })
+    case "ElevationLayer":
+      return new ElevationLayer({ url, id, title, ...rest })
+    case "VideoLayer":
+      return new VideoLayer({ url, id, title, ...rest })
+    case "VoxelLayer":
+      return new VoxelLayer({ url, id, title, ...rest })
+    default:
+      return null
+  }
 }
 
 export const ArcGISChart: React.FC<ArcGISChartProps> = ({ element }) => {
@@ -49,6 +114,12 @@ export const ArcGISChart: React.FC<ArcGISChartProps> = ({ element }) => {
       xmax: number
       ymax: number
     }
+    layers?: {
+      type: string
+      url: string
+      id?: string
+      title?: string
+    }[]
   } = {}
 
   mapData = JSON.parse(element.spec)
@@ -73,12 +144,20 @@ export const ArcGISChart: React.FC<ArcGISChartProps> = ({ element }) => {
 
   const basemap =
     mapData.basemap == "default" ? "streets-vector" : mapData.basemap
-
-  const height = "500px"
   const width = "100%"
+  const height = element.height ? `${element.height}px` : "500px"
 
   useEffect(() => {
-    const map = new Map({ basemap })
+    const layersArray: Layer[] = []
+    if (Array.isArray(mapData.layers)) {
+      mapData.layers.forEach(layerInfo => {
+        const layer = createLayerFromInfo(layerInfo)
+        if (layer) {
+          layersArray.push(layer)
+        }
+      })
+    }
+    const map = new Map({ basemap: basemap, layers: layersArray })
 
     const view = new MapView({
       container: mapRef.current as HTMLDivElement,
@@ -93,7 +172,7 @@ export const ArcGISChart: React.FC<ArcGISChartProps> = ({ element }) => {
       viewRef.current?.destroy()
       viewRef.current = null
     }
-  }, [basemap, center, zoom]) // re-run if any of these change
+  }, [basemap, center, zoom, mapData.layers]) // re-run if any of these change
 
   return (
     <div ref={mapRef} style={{ height, width }} data-testid="arcgis-chart" />

@@ -40,7 +40,33 @@ def extract_map_data(map_object: Map) -> dict[str, Any]:
     map_data = {}
     for attr in ["center", "zoom", "basemap", "layers", "extent"]:
         if hasattr(map_object, attr):
-            map_data[attr] = getattr(map_object, attr)
+            if attr == "layers":
+                map_data[attr] = []
+                for layer in map_object.layers:
+                    if hasattr(layer, "url"):
+                        map_data[attr].append(
+                            {
+                                "type": layer.__class__.__name__,
+                                "url": layer.url,
+                                "id": getattr(layer, "id", None),
+                                "title": getattr(layer, "title", None),
+                            }
+                        )
+                    elif hasattr(layer, "urlTemplate"):
+                        map_data[attr].append(
+                            {
+                                "type": layer.__class__.__name__,
+                                "urlTemplate": layer.urlTemplate,
+                                "id": getattr(layer, "id", None),
+                                "title": getattr(layer, "title", None),
+                            }
+                        )
+                    else:
+                        raise StreamlitAPIException(
+                            "Only URL-based layers are supported."
+                        )
+            else:
+                map_data[attr] = getattr(map_object, attr)
 
     if not map_data:
         raise StreamlitAPIException("No common properties found in the Map object")
