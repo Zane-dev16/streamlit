@@ -17,7 +17,7 @@
 import React, { memo, useEffect, useRef } from "react"
 
 import MapView from "@arcgis/core/views/MapView"
-import Map from "@arcgis/core/Map"
+import WebMap from "@arcgis/core/WebMap"
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer"
 import TileLayer from "@arcgis/core/layers/TileLayer"
 import VectorTileLayer from "@arcgis/core/layers/VectorTileLayer"
@@ -103,79 +103,80 @@ export const ArcGISChart: React.FC<ArcGISChartProps> = ({ element }) => {
   const mapRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<MapView | null>(null)
 
-  let mapData: {
-    widget_html?: string
-    center?: [number, number]
-    zoom?: number
-    basemap?: string
-    extent?: {
-      xmin: number
-      ymin: number
-      xmax: number
-      ymax: number
-    }
-    layers?: {
-      type: string
-      url: string
-      id?: string
-      title?: string
-    }[]
-  } = {}
+  // let mapData: {
+  //   widget_html?: string
+  //   center?: [number, number]
+  //   zoom?: number
+  //   basemap?: string
+  //   extent?: {
+  //     xmin: number
+  //     ymin: number
+  //     xmax: number
+  //     ymax: number
+  //   }
+  //   layers?: {
+  //     type: string
+  //     url: string
+  //     id?: string
+  //     title?: string
+  //   }[]
+  // } = {}
 
-  mapData = JSON.parse(element.spec)
+  let mapData = JSON.parse(element.spec)
 
   // Calculate center from extent if center not provided or invalid
-  let center = mapData.center
-  if (
-    !Array.isArray(center) ||
-    center.length !== 2 ||
-    center.some(v => typeof v !== "number")
-  ) {
-    if (mapData.extent) {
-      center = calculateCenterFromExtent(mapData.extent)
-    } else {
-      center = [0, 0] // fallback to world center
-    }
-  }
+  // let center = mapData.center
+  // if (
+  //   !Array.isArray(center) ||
+  //   center.length !== 2 ||
+  //   center.some(v => typeof v !== "number")
+  // ) {
+  //   if (mapData.extent) {
+  //     center = calculateCenterFromExtent(mapData.extent)
+  //   } else {
+  //     center = [0, 0] // fallback to world center
+  //   }
+  // }
 
-  // Validate zoom or fallback to default
-  const zoom =
-    typeof mapData.zoom === "number" && mapData.zoom >= 0 ? mapData.zoom : 4
+  // // Validate zoom or fallback to default
+  // const zoom =
+  //   typeof mapData.zoom === "number" && mapData.zoom >= 0 ? mapData.zoom : 4
 
-  const basemap =
-    mapData.basemap == "default" ? "streets-vector" : mapData.basemap
+  // const basemap =
+  //   mapData.basemap == "default" ? "streets-vector" : mapData.basemap
   const width = "100%"
   const height = element.height ? `${element.height}px` : "500px"
 
   useEffect(() => {
-    const layersArray: Layer[] = []
-    if (Array.isArray(mapData.layers)) {
-      mapData.layers.forEach(layerInfo => {
-        const layer = createLayerFromInfo(layerInfo)
-        if (layer) {
-          layersArray.push(layer)
-        }
-      })
-    }
-    const map = new Map({ basemap: basemap, layers: layersArray })
+    // const layersArray: Layer[] = []
+    // if (Array.isArray(mapData.layers)) {
+    //   mapData.layers.forEach(layerInfo => {
+    //     const layer = createLayerFromInfo(layerInfo)
+    //     if (layer) {
+    //       layersArray.push(layer)
+    //     }
+    //   })
+    // }
+    // const map = new Map({ basemap: basemap, layers: layersArray })
+    const map = WebMap.fromJSON(mapData);
 
     const view = new MapView({
-      container: mapRef.current as HTMLDivElement,
       map,
-      center,
-      zoom,
+      container: mapRef.current as HTMLDivElement,
+      // center,
+      // zoom,
     })
 
-    viewRef.current = view
+    // viewRef.current = view
 
     return () => {
       viewRef.current?.destroy()
       viewRef.current = null
     }
-  }, [basemap, center, zoom, mapData.layers]) // re-run if any of these change
+  }, [WebMap, MapView]) // re-run if any of these change
 
   return (
-    <div ref={mapRef} style={{ height, width }} data-testid="arcgis-chart" />
+    <div id="megamapview" ref={mapRef} style={{ height, width }} data-testid="arcgis-chart" />
   )
 }
 
