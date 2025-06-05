@@ -33,6 +33,7 @@ VERSION = "1.45.1"  # PEP-440
 INSTALL_REQUIRES = [
     "altair>=4.0, <6",
     "arcgis>=1.9.0, <3",
+    "arcgis-mapping>=4, <5",
     "blinker>=1.5.0, <2",
     "cachetools>=4.0, <7",
     "click>=7.0, <9",
