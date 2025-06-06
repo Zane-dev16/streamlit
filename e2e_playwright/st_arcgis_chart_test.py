@@ -21,7 +21,7 @@ def test_chart(themed_app: Page, assert_snapshot: ImageCompareFunction):
     """Check that the arcgis chart is displaying a map correctly."""
     import time
 
-    time.sleep(6)  # Arcgis maps take a bit to load
+    time.sleep(10)  # Arcgis maps take a bit to load
 
     chart = themed_app.get_by_test_id("stArcgisChart").first
     assert_snapshot(chart, name="st_arcgis_chart")
