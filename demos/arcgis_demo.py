@@ -23,4 +23,4 @@ layer = FeatureLayer(layer_url)
 usa_map.content.add(layer)
 
 # Display in Streamlit (if you have a Streamlit ArcGIS component)
-st.arcgis_chart(usa_map)
+st.arcgis_chart(usa_map, height=200)
