@@ -21,7 +21,7 @@ import WebMap from "@arcgis/core/WebMap"
 
 import { ArcgisChart as ArcgisChartProto } from "@streamlit/protobuf"
 
-interface ArcGISChartProps {
+interface ArcgisChartProps {
   element: ArcgisChartProto
 }
 
@@ -55,26 +55,28 @@ function estimateZoom(extent: Extent, mapWidthPx: number = 1024): number {
   return Math.round(zoom) / 2
 }
 
-export const ArcGISChart: React.FC<ArcGISChartProps> = ({ element }) => {
+export const ArcgisChart: React.FC<ArcgisChartProps> = ({ element }) => {
   const mapRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<MapView | null>(null)
 
   const mapData = JSON.parse(element.spec)
+
+  // Other non Arcgis json format data
+  const config = JSON.parse(element.config)
+  const extent: Extent = mapData.initialState.viewpoint.targetGeometry
+
+  const zoom = estimateZoom(extent)
+
   const width = "100%"
   const height = element.height ? `${element.height}px` : "500px"
-  const zoom = estimateZoom({
-    xmin: mapData.initialState.viewpoint.targetGeometry.xmin,
-    ymin: mapData.initialState.viewpoint.targetGeometry.ymin,
-    xmax: mapData.initialState.viewpoint.targetGeometry.xmax,
-    ymax: mapData.initialState.viewpoint.targetGeometry.ymax,
-  })
 
   useEffect(() => {
     const map = WebMap.fromJSON(mapData)
 
     const view = new MapView({
-      map,
+      ...config,
       container: mapRef.current as HTMLDivElement,
+      map,
       zoom: zoom,
     })
 
@@ -87,13 +89,8 @@ export const ArcGISChart: React.FC<ArcGISChartProps> = ({ element }) => {
   }, [mapData, zoom]) // re-run if any of these change
 
   return (
-    <div
-      id="megamapview"
-      ref={mapRef}
-      style={{ height, width }}
-      data-testid="arcgis-chart"
-    />
+    <div ref={mapRef} style={{ height, width }} data-testid="stArcgisChart" />
   )
 }
 
-export default memo(ArcGISChart)
+export default memo(ArcgisChart)

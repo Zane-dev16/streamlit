@@ -12,18 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page
 
 from e2e_playwright.conftest import ImageCompareFunction
-from e2e_playwright.shared.app_utils import check_top_level_class
 
 
 def test_chart(themed_app: Page, assert_snapshot: ImageCompareFunction):
-    """Check that the chart menu styling is correct."""
+    """Check that the arcgis chart is displaying a map correctly."""
     import time
 
-    time.sleep(6) # Arcgis maps take a bit to load 
-    chart = themed_app.get_by_test_id("arcgis-chart").first
+    time.sleep(6)  # Arcgis maps take a bit to load
+
+    chart = themed_app.get_by_test_id("stArcgisChart").first
     assert_snapshot(chart, name="st_arcgis_chart")
-
-

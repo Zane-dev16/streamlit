@@ -21,14 +21,15 @@ option java_outer_classname = "ArcgisChartProto";
 
 message ArcgisChart {
   // The unique element ID of this chart.
-  string id = 7;
+  string id = 1;
 
-  // Height in pixels
-  uint32 height = 12;
-
-  // JSON-serialized dict Map configuration.
-  string spec = 10;
+  // JSON-serialized dict Map configuration in the ARCGIS format.
+  string spec = 2;
 
   // JSON-serialized dict with additional configurations.
-  string config = 11;
+  string config = 3;
+
+  // Height in pixels
+  uint32 height = 4;
+
 }
