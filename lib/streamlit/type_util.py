@@ -226,6 +226,11 @@ def is_plotly_chart(obj: object) -> TypeGuard[Figure | list[Any] | dict[str, Any
     )
 
 
+def is_arcgis_chart(obj: object) -> bool:
+    """True if input looks like an ArcGIS chart."""
+    return is_type(obj, "arcgis.map.map_widget.Map")
+
+
 def is_graphviz_chart(
     obj: object,
 ) -> TypeGuard[graphviz.Graph | graphviz.Digraph]:
