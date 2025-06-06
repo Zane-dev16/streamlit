@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022-2025)
  *
@@ -18,24 +19,6 @@ import React, { memo, useEffect, useRef } from "react"
 
 import MapView from "@arcgis/core/views/MapView"
 import WebMap from "@arcgis/core/WebMap"
-import FeatureLayer from "@arcgis/core/layers/FeatureLayer"
-import TileLayer from "@arcgis/core/layers/TileLayer"
-import VectorTileLayer from "@arcgis/core/layers/VectorTileLayer"
-import MapImageLayer from "@arcgis/core/layers/MapImageLayer"
-import ImageryLayer from "@arcgis/core/layers/ImageryLayer"
-import WMTSLayer from "@arcgis/core/layers/WMTSLayer"
-import WMSLayer from "@arcgis/core/layers/WMSLayer"
-import WebTileLayer from "@arcgis/core/layers/WebTileLayer"
-import OpenStreetMapLayer from "@arcgis/core/layers/OpenStreetMapLayer"
-import KMLLayer from "@arcgis/core/layers/KMLLayer"
-import CSVLayer from "@arcgis/core/layers/CSVLayer"
-import GeoJSONLayer from "@arcgis/core/layers/GeoJSONLayer"
-import IntegratedMeshLayer from "@arcgis/core/layers/IntegratedMeshLayer"
-import PointCloudLayer from "@arcgis/core/layers/PointCloudLayer"
-import ElevationLayer from "@arcgis/core/layers/ElevationLayer"
-import VideoLayer from "@arcgis/core/layers/VideoLayer"
-import VoxelLayer from "@arcgis/core/layers/VoxelLayer"
-import Layer from "@arcgis/core/layers/Layer"
 
 import { ArcgisChart as ArcgisChartProto } from "@streamlit/protobuf"
 
@@ -43,140 +26,74 @@ interface ArcGISChartProps {
   element: ArcgisChartProto
 }
 
-function calculateCenterFromExtent(extent: {
+interface Extent {
   xmin: number
-  ymin: number
   xmax: number
+  ymin: number
   ymax: number
-}): [number, number] {
-  return [(extent.xmin + extent.xmax) / 2, (extent.ymin + extent.ymax) / 2]
 }
 
-function createLayerFromInfo(layerInfo: {
-  type: string
-  url: string
-  id?: string
-  title?: string
-}): Layer | null {
-  const { type, url, id, title, ...rest } = layerInfo
-  switch (type) {
-    case "FeatureLayer":
-      return new FeatureLayer({ url, id, title, ...rest })
-    case "TileLayer":
-      return new TileLayer({ url, id, title, ...rest })
-    case "VectorTileLayer":
-      return new VectorTileLayer({ url, id, title, ...rest })
-    case "MapImageLayer":
-      return new MapImageLayer({ url, id, title, ...rest })
-    case "ImageryLayer":
-      return new ImageryLayer({ url, id, title, ...rest })
-    case "WMTSLayer":
-      return new WMTSLayer({ url, id, title, ...rest })
-    case "WMSLayer":
-      return new WMSLayer({ url, id, title, ...rest })
-    case "WebTileLayer":
-      return new WebTileLayer({ urlTemplate: url, id, title, ...rest })
-    case "OpenStreetMapLayer":
-      return new OpenStreetMapLayer({ urlTemplate: url, id, title, ...rest })
-    case "KMLLayer":
-      return new KMLLayer({ url, id, title, ...rest })
-    case "CSVLayer":
-      return new CSVLayer({ url, id, title, ...rest })
-    case "GeoJSONLayer":
-      return new GeoJSONLayer({ url, id, title, ...rest })
-    case "IntegratedMeshLayer":
-      return new IntegratedMeshLayer({ url, id, title, ...rest })
-    case "PointCloudLayer":
-      return new PointCloudLayer({ url, id, title, ...rest })
-    case "ElevationLayer":
-      return new ElevationLayer({ url, id, title, ...rest })
-    case "VideoLayer":
-      return new VideoLayer({ url, id, title, ...rest })
-    case "VoxelLayer":
-      return new VoxelLayer({ url, id, title, ...rest })
-    default:
-      return null
-  }
+function estimateZoom(extent: Extent, mapWidthPx: number = 1024): number {
+  // Web Mercator full extent width (in meters)
+  const MAX_EXTENT_WIDTH = 40075016.68557849
+
+  // Tile size in pixels (standard is 256)
+  const TILE_SIZE = 256
+
+  // Calculate the visible width of the extent
+  const extentWidth = Math.abs(extent.xmax - extent.xmin)
+
+  // Meters per pixel at zoom level 0
+  const initialResolution = MAX_EXTENT_WIDTH / TILE_SIZE
+
+  // Calculate resolution (meters per pixel) for this extent and screen width
+  const resolution = extentWidth / mapWidthPx
+
+  // Estimate zoom level using formula:
+  const zoom = Math.log2(initialResolution / resolution)
+
+  // Return a rounded zoom (or adjust precision as needed)
+  return Math.round(zoom) / 2
 }
 
 export const ArcGISChart: React.FC<ArcGISChartProps> = ({ element }) => {
   const mapRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<MapView | null>(null)
 
-  // let mapData: {
-  //   widget_html?: string
-  //   center?: [number, number]
-  //   zoom?: number
-  //   basemap?: string
-  //   extent?: {
-  //     xmin: number
-  //     ymin: number
-  //     xmax: number
-  //     ymax: number
-  //   }
-  //   layers?: {
-  //     type: string
-  //     url: string
-  //     id?: string
-  //     title?: string
-  //   }[]
-  // } = {}
-
-  let mapData = JSON.parse(element.spec)
-
-  // Calculate center from extent if center not provided or invalid
-  // let center = mapData.center
-  // if (
-  //   !Array.isArray(center) ||
-  //   center.length !== 2 ||
-  //   center.some(v => typeof v !== "number")
-  // ) {
-  //   if (mapData.extent) {
-  //     center = calculateCenterFromExtent(mapData.extent)
-  //   } else {
-  //     center = [0, 0] // fallback to world center
-  //   }
-  // }
-
-  // // Validate zoom or fallback to default
-  // const zoom =
-  //   typeof mapData.zoom === "number" && mapData.zoom >= 0 ? mapData.zoom : 4
-
-  // const basemap =
-  //   mapData.basemap == "default" ? "streets-vector" : mapData.basemap
+  const mapData = JSON.parse(element.spec)
   const width = "100%"
   const height = element.height ? `${element.height}px` : "500px"
+  const zoom = estimateZoom({
+    xmin: mapData.initialState.viewpoint.targetGeometry.xmin,
+    ymin: mapData.initialState.viewpoint.targetGeometry.ymin,
+    xmax: mapData.initialState.viewpoint.targetGeometry.xmax,
+    ymax: mapData.initialState.viewpoint.targetGeometry.ymax,
+  })
 
   useEffect(() => {
-    // const layersArray: Layer[] = []
-    // if (Array.isArray(mapData.layers)) {
-    //   mapData.layers.forEach(layerInfo => {
-    //     const layer = createLayerFromInfo(layerInfo)
-    //     if (layer) {
-    //       layersArray.push(layer)
-    //     }
-    //   })
-    // }
-    // const map = new Map({ basemap: basemap, layers: layersArray })
-    const map = WebMap.fromJSON(mapData);
+    const map = WebMap.fromJSON(mapData)
 
     const view = new MapView({
       map,
       container: mapRef.current as HTMLDivElement,
-      // center,
-      // zoom,
+      zoom: zoom,
     })
 
-    // viewRef.current = view
+    viewRef.current = view
 
     return () => {
       viewRef.current?.destroy()
       viewRef.current = null
     }
-  }, [WebMap, MapView]) // re-run if any of these change
+  }, [mapData, zoom]) // re-run if any of these change
 
   return (
-    <div id="megamapview" ref={mapRef} style={{ height, width }} data-testid="arcgis-chart" />
+    <div
+      id="megamapview"
+      ref={mapRef}
+      style={{ height, width }}
+      data-testid="arcgis-chart"
+    />
   )
 }
 

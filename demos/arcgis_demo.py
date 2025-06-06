@@ -20,7 +20,7 @@ gis = GIS()
 usa_map = gis.map("USA")
 layer_url = "https://services2.arcgis.com/ZQgQTuoyBrtmoGdP/arcgis/rest/services/SF_311_Incidents/FeatureServer/0"
 layer = FeatureLayer(layer_url)
-usa_map.add_layer(layer)
+usa_map.content.add(layer)
 
 # Display in Streamlit (if you have a Streamlit ArcGIS component)
-st.arcgis_chart(usa_map, height=200)
+st.arcgis_chart(usa_map)

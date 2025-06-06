@@ -41,7 +41,7 @@ def extract_map_data(map_object: Map) -> dict[str, Any]:
 
     if type_util.is_arcgis_version_less_than("2.4.0"):
         raise StreamlitAPIException(
-            "Streamlit does not currently support Arcgis version" 
+            "Streamlit does not currently support Arcgis version"
             "older than 2.4. Please upgrade to Version 2.4"
         )
 
@@ -133,7 +133,6 @@ class ArcgisMixin:
 
         # Extract map data from the ArcGIS map object
         map_data = extract_map_data(map_object)
-        print(map_data)
 
         arcgis_chart_proto = ArcgisChartProto()
         arcgis_chart_proto.use_container_width = use_container_width
