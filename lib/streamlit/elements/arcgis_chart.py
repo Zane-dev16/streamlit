@@ -24,7 +24,6 @@ from typing import (
 )
 
 from streamlit import type_util
-from streamlit.elements.lib.form_utils import current_form_id
 from streamlit.elements.lib.utils import Key, compute_and_register_element_id, to_key
 from streamlit.errors import StreamlitAPIException
 from streamlit.proto.ArcgisChart_pb2 import ArcgisChart as ArcgisChartProto
@@ -53,7 +52,6 @@ class ArcgisMixin:
     def arcgis_chart(
         self,
         map_object: Map,
-        use_container_width: bool = True,
         *,
         height: int | None = None,
         key: Key | None = None,
@@ -77,11 +75,6 @@ class ArcgisMixin:
             - A WebMap object from arcgis.mapping
             - A map widget obtained from gis.map()
             - A dictionary containing map configuration
-
-        use_container_width : bool
-            Whether to use the full width of the container. If ``use_container_width``
-            is ``True`` (default), the map will expand to fill the available width.
-            If ``False``, the map will use its default width.
 
         height : int or None
             The height of the map in pixels. If ``None``, a default height will be used.
@@ -125,7 +118,7 @@ class ArcgisMixin:
         >>> map = gis.map("New York")
         >>>
         >>> # Display map with custom height
-        >>> st.arcgis_chart(map, height=600, use_container_width=False)
+        >>> st.arcgis_chart(map, height=600)
 
         """
 
@@ -135,8 +128,6 @@ class ArcgisMixin:
         map_data = extract_map_data(map_object)
 
         arcgis_chart_proto = ArcgisChartProto()
-        arcgis_chart_proto.use_container_width = use_container_width
-        arcgis_chart_proto.form_id = current_form_id(self.dg)
 
         if height is not None:
             arcgis_chart_proto.height = height
@@ -152,13 +143,12 @@ class ArcgisMixin:
         # when the frontend component gets unmounted and remounted.
         arcgis_chart_proto.id = compute_and_register_element_id(
             "arcgis_chart",
+            form_id=None,
             user_key=key,
-            form_id=arcgis_chart_proto.form_id,
             dg=self.dg,
             arcgis_spec=arcgis_chart_proto.spec,
             arcgis_config=arcgis_chart_proto.config,
             height=height,
-            use_container_width=use_container_width,
         )
 
         return self.dg._enqueue("arcgis_chart", arcgis_chart_proto)

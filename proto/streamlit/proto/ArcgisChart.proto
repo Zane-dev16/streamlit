@@ -26,6 +26,9 @@ message ArcgisChart {
   // Height in pixels
   uint32 height = 12;
 
-  // JSON-serialized dict containing keys from the set {data, frames, layout}.
+  // JSON-serialized dict Map configuration.
   string spec = 10;
+
+  // JSON-serialized dict with additional configurations.
+  string config = 11;
 }
