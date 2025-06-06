@@ -421,6 +421,30 @@ def is_altair_version_less_than(v: str) -> bool:
     return is_version_less_than(alt.__version__, v)
 
 
+def is_arcgis_version_less_than(v: str) -> bool:
+    """Return True if the current Arcgis version is less than the input version.
+
+    Parameters
+    ----------
+    v : str
+        Version string, e.g. "2.3.1"
+
+    Returns
+    -------
+    bool
+
+
+    Raises
+    ------
+    InvalidVersion
+        If the version strings are not valid.
+
+    """
+    import arcgis as arc
+
+    return is_version_less_than(arc.__version__, v)
+
+
 def is_version_less_than(v1: str, v2: str) -> bool:
     """Return True if the v1 version string is less than the v2 version string
     based on semantic versioning.

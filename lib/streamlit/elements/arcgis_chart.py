@@ -23,6 +23,7 @@ from typing import (
     cast,
 )
 
+from streamlit import type_util
 from streamlit.elements.lib.form_utils import current_form_id
 from streamlit.elements.lib.utils import Key, compute_and_register_element_id, to_key
 from streamlit.errors import StreamlitAPIException
@@ -37,6 +38,13 @@ if TYPE_CHECKING:
 
 def extract_map_data(map_object: Map) -> dict[str, Any]:
     """Extract map configuration and data from ArcGIS map object."""
+
+    if type_util.is_arcgis_version_less_than("2.4.0"):
+        raise StreamlitAPIException(
+            "Streamlit does not currently support Arcgis version" 
+            "older than 2.4. Please upgrade to Version 2.4"
+        )
+
     return json.dumps(map_object._webmap_dict)
 
 
